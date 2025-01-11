@@ -1,6 +1,7 @@
 """
 Downloads files and stores them locally.
 """
+import gzip
 import os
 import re
 import zipfile
@@ -15,7 +16,11 @@ class HttpCache:
     the file path if the same file is requested twice. Also automatically handles retries when request fails.
     """
 
-    def __init__(self, cache_dir: str, delay: int = 500, verify_https: bool = True):
+    def __init__(self, 
+                 cache_dir: str, 
+                 delay: int = 500, 
+                 verify_https: bool = True,
+                 compress: bool = False):
         """
         :param cache_dir: Root directory of the disk cache (all requested files will be cached in this directory)
         :param delay: Minimum time in milliseconds between two requests
@@ -26,6 +31,7 @@ class HttpCache:
         self.cache_dir: str = cache_dir
         self.headers: dict or None = None
         self.connection_manager = ConnectionManager(delay, verify_https=verify_https)
+        self.compress: bool = compress
 
     def set_headers(self, headers: dict) -> None:
         """
@@ -60,7 +66,7 @@ class HttpCache:
         self.connection_manager._backoff_factor = backoff_factor
         self.connection_manager.logs = logs
 
-    def cache_file(self, file_url: str) -> str:
+    def cache_file(self, file_url: str, raw: bool = False) -> str:
         """
         Caches a file in the http cache.
 
@@ -88,9 +94,15 @@ class HttpCache:
                 raise Exception(
                     "Could not download file from {}. Error code: {}".format(file_url, query_response.status_code))
 
-        with open(file_path, "wb+") as file:
-            file.write(query_response.content)
-            file.close()
+        if not self.compress or raw:
+            with open(file_path, "wb+") as file:
+                file.write(query_response.content)
+                file.close()
+
+        elif self.compress:
+            with gzip.open(file_path, "wb+") as file:
+                file.write(query_response.content)
+                file.close()
 
         return file_path
 
@@ -114,7 +126,7 @@ class HttpCache:
         :param url: url of the file you want to know the cache path
         :return: absolute local cache path
         """
-        return self.cache_dir + re.sub("https?://", "", url.strip())
+        return self.cache_dir + re.sub("https?://", "", url.strip()) + (".gz" if self.compress else "")
 
     def cache_edgar_enclosure(self, enclosure_url: str) -> str:
         """

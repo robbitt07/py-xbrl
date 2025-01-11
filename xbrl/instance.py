@@ -5,6 +5,7 @@ This module will also access other Modules i.e TaxonomySchema.py to parse the In
 as well as the taxonomies and linkbases used by the instance files
 """
 import abc
+import gzip
 import json
 import logging
 import re
@@ -496,8 +497,13 @@ def parse_ixbrl(instance_path: str, cache: HttpCache, instance_url: str or None 
     => in the XBRL-parse function root is ET.Element, here just an instance of ElementTree class!
     """
 
-    instance_file = open(instance_path, "r", encoding=encoding)
-    contents = instance_file.read()
+    if cache.compress:
+        instance_file = gzip.open(instance_path, "rt", encoding=encoding)
+        contents = instance_file.read()
+    else:
+        instance_file = open(instance_path, "r", encoding=encoding)
+        contents = instance_file.read()
+
     pattern = r'<[ ]*script.*?\/[ ]*script[ ]*>'
     contents = re.sub(pattern, '', contents, flags=(re.IGNORECASE | re.MULTILINE | re.DOTALL))
 

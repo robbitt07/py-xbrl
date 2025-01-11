@@ -422,7 +422,7 @@ def parse_linkbase_url(linkbase_url: str, linkbase_type: LinkbaseType, cache: Ht
     if not is_url(linkbase_url): raise XbrlParseException('This function only parses remotely saved linkbases. '
                                                           'Please use parse_linkbase to parse local linkbases')
 
-    linkbase_path: str = cache.cache_file(linkbase_url)
+    linkbase_path: str = cache.cache_file(linkbase_url, raw=True)
     return parse_linkbase(linkbase_path, linkbase_type, linkbase_url)
 
 
