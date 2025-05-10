@@ -629,7 +629,7 @@ def parse_taxonomy_url(schema_url: str, cache: HttpCache, imported_schema_uris: 
     """
     if not is_url(schema_url): raise XbrlParseException('This function only parses remotely saved taxonomies. '
                                                         'Please use parse_taxonomy to parse local taxonomy schemas')
-    schema_path: str = cache.cache_file(schema_url)
+    schema_path: str = cache.cache_file(schema_url, raw=True)
     return parse_taxonomy(schema_path, cache, imported_schema_uris, schema_url)
 
 
