@@ -3,6 +3,7 @@ This module contains all classes and functions necessary for parsing Taxonomy sc
 """
 import logging
 import os
+import json
 import xml.etree.ElementTree as ET
 from functools import lru_cache
 from typing import List
@@ -449,6 +450,9 @@ ns_schema_map: dict = {
     'http://xbrl.sec.gov/rr-lab/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_lab.xsd',
     'http://xbrl.sec.gov/rr-pre/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_pre.xsd',
     'http://xbrl.sec.gov/rr-def/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_def.xsd',
+    'http://xbrl.sec.gov/cyd/2024': 'https://xbrl.sec.gov/cyd/2024/cyd-2024.xsd',
+    'http://xbrl.sec.gov/cyd-entire/2024': 'https://xbrl.sec.gov/cyd/2024/cyd-entire-2024.xsd',
+    
     'http://www.xbrl.org/dtr/type/2022-03-31': 'https://www.xbrl.org/dtr/type/2022-03-31/types.xsd',
 
     'http://www.hmrc.gov.uk/schemas/ct/dpl/2021-01-01': 'https://www.hmrc.gov.uk/schemas/ct/dpl/2021-01-01/dpl-2021.xsd'
@@ -480,6 +484,29 @@ class Concept:
         self.period_type: str or None = None
         self.balance: str or None = None
         self.labels: [Label] = []
+    
+    def to_dict(self):
+        """
+        Converts the Concept object into a dictionary representation
+        """
+        return {
+            'xml_id': self.xml_id,
+            'schema_url': self.schema_url,
+            'name': self.name,
+            'substitution_group': self.substitution_group,
+            'concept_type': self.concept_type,
+            'abstract': self.abstract,
+            'nillable': self.nillable,
+            'period_type': self.period_type,
+            'balance': self.balance,
+            'labels': [label.to_dict() for label in self.labels] if self.labels else []  # Assuming Label class has to_dict()
+        }
+
+    def to_json(self):
+        """
+        Converts the Concept object into a JSON string
+        """
+        return json.dumps(self.to_dict(), indent=4)
 
     def __str__(self) -> str:
         return self.name
@@ -674,7 +701,7 @@ def parse_taxonomy(schema_path: str, cache: HttpCache, imported_schema_uris : se
         el_name: str = element.attrib['name']
 
         concept = Concept(el_id, schema_url, el_name)
-        concept.type = element.attrib['type'] if 'type' in element.attrib else False
+        concept.concept_type = element.attrib['type'] if 'type' in element.attrib else None
         concept.nillable = bool(element.attrib['nillable']) if 'nillable' in element.attrib else False
         concept.abstract = bool(element.attrib['abstract']) if 'abstract' in element.attrib else False
         type_attr_name = XBRLI_NS + 'periodType'
