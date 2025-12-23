@@ -170,6 +170,7 @@ ns_schema_map: dict = {
     "http://fasb.org/srt/2022": "https://xbrl.fasb.org/srt/2022/elts/srt-2022.xsd",
     "http://fasb.org/srt/2023": "https://xbrl.fasb.org/srt/2023/elts/srt-2023.xsd",
     "http://fasb.org/srt/2024": "https://xbrl.fasb.org/srt/2024/elts/srt-2024.xsd",
+    "http://fasb.org/srt/2025": "https://xbrl.fasb.org/srt/2025/elts/srt-2025.xsd",
     "http://fasb.org/srt-roles/2018-01-31": "http://xbrl.fasb.org/srt/2018/elts/srt-roles-2018-01-31.xsd",
     "http://fasb.org/srt-roles/2019-01-31": "http://xbrl.fasb.org/srt/2019/elts/srt-roles-2019-01-31.xsd",
     "http://fasb.org/srt-roles/2020-01-31": "http://xbrl.fasb.org/srt/2020/elts/srt-roles-2020-01-31.xsd",
@@ -193,6 +194,7 @@ ns_schema_map: dict = {
     "http://fasb.org/us-gaap/2022": "https://xbrl.fasb.org/us-gaap/2022/elts/us-gaap-2022.xsd",
     "http://fasb.org/us-gaap/2023": "https://xbrl.fasb.org/us-gaap/2023/elts/us-gaap-2023.xsd",
     "http://fasb.org/us-gaap/2024": "https://xbrl.fasb.org/us-gaap/2024/elts/us-gaap-2024.xsd",
+    "http://fasb.org/us-gaap/2025": "https://xbrl.fasb.org/us-gaap/2025/elts/us-gaap-2025.xsd",
     "http://fasb.org/us-roles/2011-01-31": "http://xbrl.fasb.org/us-gaap/2011/elts/us-roles-2011-01-31.xsd",
     "http://fasb.org/us-roles/2012-01-31": "http://xbrl.fasb.org/us-gaap/2012/elts/us-roles-2012-01-31.xsd",
     "http://fasb.org/us-roles/2013-01-31": "http://xbrl.fasb.org/us-gaap/2013/elts/us-roles-2013-01-31.xsd",
@@ -286,6 +288,7 @@ ns_schema_map: dict = {
     "http://xbrl.sec.gov/dei/2023": "https://xbrl.sec.gov/dei/2023/dei-2023.xsd",
     "http://xbrl.sec.gov/dei/2024": "https://xbrl.sec.gov/dei/2024/dei-2024.xsd",
     "http://xbrl.sec.gov/dei/2021q4": "https://xbrl.sec.gov/dei/2021q4/dei-2021q4.xsd",
+    "http://xbrl.sec.gov/dei/2025": "https://xbrl.sec.gov/dei/2025/dei-2025.xsd",
     "http://xbrl.sec.gov/dei-def/2021": "https://xbrl.sec.gov/dei/2021/dei-2021_def.xsd",
     "http://xbrl.sec.gov/dei-entire/2021": "https://xbrl.sec.gov/dei/2021/dei-entire-2021.xsd",
     "http://xbrl.sec.gov/dei-ent-std/2019-01-31": "https://xbrl.sec.gov/dei/2019/dei-ent-std-2019-01-31.xsd",
@@ -450,8 +453,10 @@ ns_schema_map: dict = {
     'http://xbrl.sec.gov/rr-lab/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_lab.xsd',
     'http://xbrl.sec.gov/rr-pre/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_pre.xsd',
     'http://xbrl.sec.gov/rr-def/2022': 'https://xbrl.sec.gov/rr/2022/rr-2022_def.xsd',
+
     'http://xbrl.sec.gov/cyd/2024': 'https://xbrl.sec.gov/cyd/2024/cyd-2024.xsd',
     'http://xbrl.sec.gov/cyd-entire/2024': 'https://xbrl.sec.gov/cyd/2024/cyd-entire-2024.xsd',
+    'http://xbrl.sec.gov/cyd/2025': 'https://xbrl.sec.gov/cyd/2025/cyd-2025.xsd',  
     
     'http://www.xbrl.org/dtr/type/2022-03-31': 'https://www.xbrl.org/dtr/type/2022-03-31/types.xsd',
 
@@ -629,7 +634,7 @@ def parse_taxonomy_url(schema_url: str, cache: HttpCache, imported_schema_uris: 
     """
     if not is_url(schema_url): raise XbrlParseException('This function only parses remotely saved taxonomies. '
                                                         'Please use parse_taxonomy to parse local taxonomy schemas')
-    schema_path: str = cache.cache_file(schema_url)
+    schema_path: str = cache.cache_file(schema_url, raw=True)
     return parse_taxonomy(schema_path, cache, imported_schema_uris, schema_url)
 
 
